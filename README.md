@@ -1,2 +1,38 @@
 # Lab-Program-14
 EXERCISES TO PERFORM DATA CLEANING (SAME FORMAT OF DATE AND CATEGORICAL DATA, OUTLIER, NORMALIZATION, DUPLICATE VALUES AND MISSING VALUES) OPERATIONS USING DATA FRAMES.
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+
+df = pd.DataFrame({
+    'Date': ['2023-01-01', '02-01-2023', 'Invalid'],
+    'Category': ['Apple', 'apple', 'Banana'],
+    'Value': [10, 1500, 20],
+    'Missing': [1, np.nan, 3]
+})
+
+print("Original Data:\n", df)
+
+df.drop_duplicates(inplace=True)
+df['Missing'].fillna(df['Missing'].mean(), inplace=True)
+df['Date'] = pd.to_datetime(df['Date'], errors='coerce').ffill()
+df['Category'] = df['Category'].str.lower()
+df['Value'] = np.where(df['Value'] > 100, 100, df['Value'])
+
+scaler = MinMaxScaler()
+df['Value_norm'] = scaler.fit_transform(df[['Value']])
+
+print("\nCleaned Data:\n", df)
+
+Output:
+Original Data:
+          Date Category  Value  Missing
+0  2023-01-01    Apple     10      1.0
+1  02-01-2023    apple   1500      NaN
+2     Invalid   Banana     20      3.0
+
+Cleaned Data:
+         Date Category  Value  Missing  Value_norm
+0 2023-01-01    apple     10      1.0    0.000000
+1 2023-01-01    apple    100      2.0    1.000000
+2 2023-01-01   banana     20      3.0    0.111111
